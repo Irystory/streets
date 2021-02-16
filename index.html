@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="utf-8" />
+	<title>Vladikavkaz Street Names</title>
+	<meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
+	<script src="https://api.mapbox.com/mapbox-gl-js/v2.1.1/mapbox-gl.js"></script>
+	<link href="https://api.mapbox.com/mapbox-gl-js/v2.1.1/mapbox-gl.css" rel="stylesheet" />
+
+	<style>
+		body {
+			margin: 0;
+			padding: 0;
+		}
+
+		#map {
+			position: absolute;
+			top: 0;
+			bottom: 0;
+			width: 100%;
+		}
+
+		.mapboxgl-popup-content h3 {
+			background: #bbb;
+			color: #fff;
+			margin: 10;
+			display: inline;
+			padding: 2px;
+			font-weight: 500;
+			margin-top: 0px;
+			font-size: 14px;
+		}
+
+		.mapboxgl-popup-content h4 {
+			margin: 0;
+			display: block;
+			padding: 0px;
+			font-weight: 500;
+			margin-top: 0px;
+			font-size: 14px;
+		}
+
+		.mapboxgl-popup-content h5 {
+			margin: 0;
+			display: block;
+			padding: 0px;
+			font-weight: 500;
+			margin-top: 0px;
+			font-size: 12px;
+		}
+
+		.mapboxgl-popup-content p {
+			margin: 0;
+			display: block;
+			padding: 0px;
+			font-weight: 400;
+			margin-top: 0px;
+			font-size: 11px;
+		}
+
+		.mapboxgl-popup-content hr {
+			border-style: none;
+		}
+
+		.mapboxgl-popup-content-wrapper {
+			padding: 10%;
+		}
+
+		@keyframes fadein {
+			from {
+				opacity: 0;
+			}
+
+			to {
+				opacity: 1;
+			}
+		}
+
+		.mapboxgl-popup {
+			animation: fadein 0.2s;
+		}
+
+		.mapboxgl-popup-content {
+			max-width: 250px;
+			min-width: 50px;
+			border-radius: 12px;
+			padding: 13px 19px;
+			box-shadow: 0 3px 14px rgba(0, 0, 0, 0.4);
+		}
+
+		.mapboxgl-popup-close-button {
+			font-size: 16px;
+			font-family: Tahoma, Verdana, sans-serif;
+			color: #c3c3c3;
+			font-weight: bold;
+			border-width: 0px;
+		}
+
+		.mapboxgl-popup-close-button:hover {
+			color: #999;
+			background-color: white;
+			border-top-right-radius: 12px;
+		}
+	</style>
+
+</head>
+
+<body>
+	<div id="map"></div>
+	<script>
+		mapboxgl.accessToken = 'pk.eyJ1IjoibmlubGluIiwiYSI6ImNqanR0Zzc4bzI5b2Ezd2xlb2ZmbzdrOHMifQ.nhMfjVcApf7oZVzhlMnRLA';
+
+		var bounds = [
+				[44.5701252638, 42.9501212402],
+				[44.7658192336, 43.111741861]
+		];
+
+		var map = new mapboxgl.Map({
+			container: 'map',
+			style: 'mapbox://styles/ninlin/ck2x303h21maj1cpiifynp845',
+			center: [44.67, 43.025],
+			zoom: 13,
+			maxBounds: bounds
+		});
+
+
+		map.on('load', function() {
+			map.addSource('route', {
+				'type': 'geojson',
+				'data': 'https://raw.githubusercontent.com/Ninlin/irystory/main/streets_20210216.geojson'
+			});
+			map.addLayer({
+				'id': 'route',
+				'type': 'line',
+				'source': 'route',
+				'layout': {
+					'line-join': 'round',
+					'line-cap': 'round'
+				},
+				'paint': {
+					'line-color': [
+						'match',
+						['get', 'cat_new'],
+						'military_ww',
+						'#009665',
+						'culture',
+						'#F3CE75',
+						'revolutionary, communist',
+						'#EA0A8D',
+						'russian',
+						'#5F239A',
+						'air',
+						'#98ded9',
+						/* other */
+						'#ccc'
+					],
+					'line-width': 2.5,
+					'line-opacity': 0.8
+				}
+			});
+			map.addLayer({
+				'id': 'outline',
+				'type': 'line',
+				'source': 'route',
+				'layout': {
+					'line-join': 'round',
+					'line-cap': 'round'
+				},
+				'paint': {
+					'line-gap-width': 20,
+					'line-width': 1,
+					'line-color': 'white',
+					'line-opacity': 0
+				}
+
+			})
+
+
+			var popup = new mapboxgl.Popup({
+				closeButton: true,
+				closeOnClick: false
+			});
+
+			map.on('mouseenter', 'outline', function(e) {
+				map.getCanvas().style.cursor = 'pointer';
+
+				var coordinates = e.features[0].geometry.coordinates.slice();
+				var name = e.features[0].properties.name;
+				var occupation = e.features[0].properties.occupation;
+				var full_name = e.features[0].properties.full_name;
+				var birth = e.features[0].properties.date_birth;
+				var death = e.features[0].properties.date_death;
+				// Ensure that if the map is zoomed out such that multiple
+				// copies of the feature are visible, the popup appears
+				// over the copy being pointed to.
+
+
+
+				// Populate the popup and set its coordinates
+				// based on the feature found.
+				if (full_name == "null") {
+					popup
+						.setLngLat(e.lngLat)
+						.setHTML("<h3>" + name + "</h3>")
+						.addTo(map);
+				} else if (birth == "null") {
+					popup
+						.setLngLat(e.lngLat)
+						.setHTML("<h3>" + name + "</h3>" +
+							"<hr>" +
+							"<h4>" + full_name + '</h4>' +
+							'<p>' + occupation + '</p>')
+						.addTo(map);
+				} else {
+					popup
+						.setLngLat(e.lngLat)
+						.setHTML("<h3>" + name + "</h3>" +
+							"<hr>" +
+							"<h4>" + full_name + '</h4>' +
+							'<h5>' + birth + '-' + death + '</h5>' +
+							'<p>' + occupation + '</p>')
+						.addTo(map);
+
+				};
+
+
+			});
+			map.on('mouseleave', 'outline', function() {
+				map.getCanvas().style.cursor = '';
+				popup.remove();
+			});
+		});
+	</script>
+
+</body>
+
+</html>
