@@ -6,19 +6,68 @@
 	<title>Vladikavkaz Street Names</title>
 	<meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
 	<script src="https://api.mapbox.com/mapbox-gl-js/v2.1.1/mapbox-gl.js"></script>
+	<script type="text/javascript" src="https://d3js.org/d3.v6.js"></script>
 	<link href="https://api.mapbox.com/mapbox-gl-js/v2.1.1/mapbox-gl.css" rel="stylesheet" />
 
 	<style>
 		body {
-			margin: 0;
 			padding: 0;
 		}
 
+		h2 {
+			margin-top: 40px;
+			font-family: "Futura";
+			text-transform: uppercase;
+			font-size: 25px;
+			max-width: 800px;
+		}
+
+		p {
+			margin-top: 20px;
+			font-size: 15px;
+			font-family: "Merriweather", "Helvetica Neue", Helvetica, Arial, sans-serif;
+			max-width: 800px;
+		}
+
+		.text {
+			font-weight: normal;
+			margin-left: auto;
+			margin-right: auto;
+			width: 80%;
+		}
+
+		#chart2 {
+			text-align: center;
+			margin: auto;
+			display: block;
+			height: 250px;
+			width: 80%;
+		}
+
+		.chart-title {
+			text-align: left;
+			font-weight: normal;
+			margin-top: 50px;
+			margin-left: auto;
+			margin-right: auto;
+		}
+
+		.chart {
+			margin-left: auto;
+			margin-right: auto;
+		}
+
+		.parent {
+			margin: auto;
+		}
+
 		#map {
-			position: absolute;
-			top: 0;
-			bottom: 0;
-			width: 100%;
+			position: relative;
+			top: 30px;
+			height: 500px;
+			max-width: 800px;
+			margin: auto;
+			display: block;
 		}
 
 		.mapboxgl-popup-content h3 {
@@ -107,23 +156,158 @@
 </head>
 
 <body>
-	<div id="map"></div>
+	<div class="header">
+		<h2 class="text">О чем помнят улицы Владикавказа?</h2>
+		<p class="text">Какие категории названий преобладают в городе: революционно-коммунистические, военные или же научно-культурные?
+		</p>
+	</div>
+
+
+	<div class="parent">
+		<div id="map"></div>
+	</div>
+
+	<div id="chart2">
+		<p class="chart-title">Распределение названий улиц по категориям:</p>
+		<script type="text/javascript">
+			var w = 800;
+			var h = 260;
+
+			var margin = ({
+				top: 0,
+				right: 510,
+				bottom: 0,
+				left: 0
+			})
+
+			var dataset = [{
+					cat: 'нейтральные и географические',
+					value: 0.3855
+				},
+				{
+					cat: 'революционно-коммунистические',
+					value: 0.2087
+				},
+				{
+					cat: 'в честь деятелей науки и культуры',
+					value: 0.1710
+				},
+				{
+					cat: 'в честь героев ВОВ',
+					value: 0.1188
+				},
+				{
+					cat: 'из дореволюционной эпохи',
+					value: 0.0522
+				},
+				{
+					cat: 'в честь летчиков и космонавтов',
+					value: 0.0435
+				},
+				{
+					cat: 'другие',
+					value: 0.0203
+				},
+			];
+
+
+			var xMax = d3.max(dataset, d => d.value)
+			var colors = ['#ccc', '#EA0A8D', '#ffcc00', '#69c242', '#5F239A', '#98ded9'];
+			var color = d3.scaleOrdinal()
+				.domain(dataset.map(function(d) {
+					return d.cat
+				}))
+				.range(colors);
+
+			dataset.sort(function(a, b) {
+				return d3.ascending(a.value, b.value)
+			})
+
+			var yScale = d3.scaleBand()
+				.domain(dataset.map(function(d) {
+					return d.cat
+				})) // to set the ordinal domain specify an array with category names
+				.range([h - margin.bottom, margin.top])
+				.padding(0.6); // takes the low and high values and automatically divides the range into even chunks or bands based on the length of the domain. Third parameter - spacing between bands 20% of the width will be used for spacing
+			// rangeRoundBands() rounds to the nearest whole pixel
+
+			var xScale = d3.scaleLinear()
+				.domain([0, xMax])
+				.range([margin.left, w - margin.left - margin.right]);
+
+			var svgbar = d3.select("div#chart2")
+				.append('svg')
+				.attr('class', "chart")
+				//.attr("viewBox", `0 0 500 250`)
+				.attr('width', w)
+				.attr("height", h);
+
+			svgbar.selectAll('rect')
+				.data(dataset)
+				.join("rect")
+				.attr('x', margin.left)
+				.attr('y', function(d) {
+					return yScale(d.cat);
+				})
+				.attr('width', function(d) {
+					return xScale(d.value);
+				}) //??
+				.attr('height', yScale.bandwidth())
+				.style('fill', function(d) {
+					return color(d.cat)
+				});
+
+
+			svgbar.selectAll('text.title')
+				.data(dataset)
+				.join("text")
+				.attr("class", "title")
+				.text(function(d) {
+					return d.cat;
+				})
+				.attr('x', margin.left)
+				.attr('y', function(d) {
+					return yScale(d.cat) - 3;
+				})
+				.attr('font-size', '12px')
+				.attr('font-family', "Merriweather");
+
+			svgbar.selectAll('text.value')
+				.data(dataset)
+				.join("text")
+				.attr("class", "value")
+				.text(function(d) {
+					return d3.format(".0%")(d.value);
+				})
+				.attr('x', function(d) {
+					return xScale(d.value) + 3;
+				})
+				.attr('y', function(d) {
+					return yScale(d.cat) + 10;
+				})
+				.attr('font-size', '11px')
+				.attr('font-family', "Merriweather");
+		</script>
+	</div>
+
+
 	<script>
 		mapboxgl.accessToken = 'pk.eyJ1IjoibmlubGluIiwiYSI6ImNqanR0Zzc4bzI5b2Ezd2xlb2ZmbzdrOHMifQ.nhMfjVcApf7oZVzhlMnRLA';
 
 		var bounds = [
-				[44.5701252638, 42.9501212402],
-				[44.7658192336, 43.111741861]
+			[44.5701252638, 42.9501212402],
+			[44.7658192336, 43.111741861]
 		];
 
 		var map = new mapboxgl.Map({
 			container: 'map',
 			style: 'mapbox://styles/ninlin/ck2x303h21maj1cpiifynp845',
 			center: [44.67, 43.025],
-			zoom: 13,
+			zoom: 12,
 			maxBounds: bounds
 		});
-		map.scrollZoom.disable();
+
+
 
 		map.on('load', function() {
 			map.addSource('route', {
@@ -174,11 +358,14 @@
 					'line-opacity': 0
 				}
 
-			})
+			});
 
+
+			map.scrollZoom.disable();
+			map.addControl(new mapboxgl.NavigationControl());
 
 			var popup = new mapboxgl.Popup({
-				closeButton: true,
+				closeButton: false,
 				closeOnClick: false
 			});
 
@@ -224,18 +411,21 @@
 
 				};
 
+				map.on('mouseenter', 'outline', function() {
+					map.getCanvas().style.cursor = 'pointer';
+				});
+
 
 			});
-			map.on('mouseenter', 'outline', function () {
-				map.getCanvas().style.cursor = 'pointer';
-				});
-			
 			map.on('mouseleave', 'outline', function() {
 				map.getCanvas().style.cursor = '';
 				popup.remove();
 			});
 		});
 	</script>
+
+
+
 
 </body>
 
