@@ -57,18 +57,13 @@
 			margin-right: auto;
 		}
 
-		.parent {
-			margin: auto;
-		}
-
 		#map {
-			display: block;
-			margin: auto;
 			position: relative;
-			top: 30px;
 			height: 500px;
+			max-width: 800px;
+			margin: auto;
 			width: 80%;
-			max-width: 800px;	
+			display: block;
 		}
 
 		.mapboxgl-popup-content h3 {
@@ -163,20 +158,17 @@
 		</p>
 	</div>
 
-
-	<div class="parent">
 		<div id="map"></div>
-	</div>
 
 	<div id="chart2">
 		<p class="chart-title">Распределение названий улиц по категориям:</p>
 		<script type="text/javascript">
-			var w = 800;
+			var w = 300;
 			var h = 260;
 
 			var margin = ({
 				top: 0,
-				right: 510,
+				right: 30,
 				bottom: 0,
 				left: 0
 			})
