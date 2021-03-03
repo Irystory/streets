@@ -8,6 +8,8 @@
 	<script src="https://api.mapbox.com/mapbox-gl-js/v2.1.1/mapbox-gl.js"></script>
 	<script type="text/javascript" src="https://d3js.org/d3.v6.js"></script>
 	<link href="https://api.mapbox.com/mapbox-gl-js/v2.1.1/mapbox-gl.css" rel="stylesheet" />
+	<link rel="preconnect" href="https://fonts.gstatic.com">
+	<link href="https://fonts.googleapis.com/css2?family=Lato&family=Montserrat&family=Noto+Sans+JP&family=Open+Sans&family=Roboto&family=Roboto+Slab&family=Rubik:wght@300;500&display=swap" rel="stylesheet">
 
 	<style>
 		body {
@@ -15,8 +17,8 @@
 		}
 
 		h2 {
-			margin-top: 20px;
-			font-family: "Futura";
+			margin-top: 30px;
+			font-family: 'Roboto', sans-serif;
 			text-transform: uppercase;
 			font-size: 25px;
 			max-width: 800px;
@@ -24,8 +26,9 @@
 
 		p {
 			margin-top: 20px;
+			margin-bottom: 20px;
 			font-size: 15px;
-			font-family: "Merriweather", "Helvetica Neue", Helvetica, Arial, sans-serif;
+			font-family: 'Montserrat', sans-serif;
 			max-width: 800px;
 		}
 
@@ -36,11 +39,23 @@
 			width: 80%;
 		}
 
+		#rev {
+			background-color: rgba(234, 10, 141, .5);
+		}
+
+		#vov {
+			background-color: rgba(0, 150, 101, .5);
+		}
+
+		#cult {
+			background-color: rgba(243, 206, 117);
+		}
+
 		#chart2 {
 			text-align: center;
 			margin: auto;
 			display: block;
-			height: 250px;
+			height: 300px;
 			width: 80%;
 		}
 
@@ -55,6 +70,15 @@
 		.chart {
 			margin-left: auto;
 			margin-right: auto;
+			display: block;
+		}
+
+		.title {
+			font-family: 'Montserrat', sans-serif;
+		}
+
+		.value {
+			font-family: 'Montserrat', sans-serif;
 		}
 
 		#map {
@@ -154,7 +178,9 @@
 <body>
 	<div class="header">
 		<h2 class="text">О чем помнят улицы Владикавказа?</h2>
-		<p class="text">Какие категории названий преобладают в городе: революционно-коммунистические, военные или же научно-культурные?
+		<p class="text">Какие категории названий преобладают в городе:
+			<span id="rev">революционно-коммунистические</span>,
+			<span id="vov">военные</span> или же <span id="cult">научно-культурные</span>?
 		</p>
 	</div>
 
@@ -164,7 +190,7 @@
 		<p class="chart-title">Распределение названий улиц по категориям:</p>
 		<script type="text/javascript">
 			var w = 300;
-			var h = 260;
+			var h = 300;
 
 			var margin = ({
 				top: 0,
@@ -256,30 +282,29 @@
 				.join("text")
 				.attr("class", "title")
 				.text(function(d) {
-					return d.cat;
+					return d3.format(".0%")(d.value) + ' ' + d.cat;
 				})
 				.attr('x', margin.left)
 				.attr('y', function(d) {
 					return yScale(d.cat) - 3;
 				})
-				.attr('font-size', '12px')
+				.attr('font-size', '13px')
 				.attr('font-family', "Merriweather");
 
-			svgbar.selectAll('text.value')
-				.data(dataset)
-				.join("text")
-				.attr("class", "value")
-				.text(function(d) {
-					return d3.format(".0%")(d.value);
-				})
-				.attr('x', function(d) {
-					return xScale(d.value) + 3;
-				})
-				.attr('y', function(d) {
-					return yScale(d.cat) + 10;
-				})
-				.attr('font-size', '11px')
-				.attr('font-family', "Merriweather");
+			// svgbar.selectAll('text.value')
+			// 	.data(dataset)
+			// 	.join("text")
+			// 	.attr("class", "value")
+			// 	.text(function(d) {
+			// 		return d3.format(".0%")(d.value);
+			// 	})
+			// 	.attr('x', function(d) {
+			// 		return xScale(d.value) + 4
+			// 	})
+			// 	.attr('y', function(d) {
+			// 		return yScale(d.cat) + 12;
+			// 	})
+			// 	.attr('font-size', '12px')
 		</script>
 	</div>
 
@@ -288,8 +313,8 @@
 		mapboxgl.accessToken = 'pk.eyJ1IjoibmlubGluIiwiYSI6ImNqanR0Zzc4bzI5b2Ezd2xlb2ZmbzdrOHMifQ.nhMfjVcApf7oZVzhlMnRLA';
 
 		var bounds = [
-			[44.5701252638, 42.9501212402],
-			[44.7658192336, 43.111741861]
+			[44.60440205, 42.9610714855],
+			[44.74184213, 43.08664198]
 		];
 
 		var map = new mapboxgl.Map({
