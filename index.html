@@ -21,7 +21,7 @@
 			font-family: 'Roboto', sans-serif;
 			text-transform: uppercase;
 			font-size: 25px;
-			max-width: 800px;
+			max-width: 600px;
 		}
 
 		p {
@@ -29,7 +29,7 @@
 			margin-bottom: 20px;
 			font-size: 15px;
 			font-family: 'Montserrat', sans-serif;
-			max-width: 800px;
+			max-width: 600px;
 		}
 
 		.text {
@@ -84,7 +84,7 @@
 		#map {
 			position: relative;
 			height: 500px;
-			max-width: 800px;
+			max-width: 600px;
 			margin: auto;
 			width: 80%;
 			display: block;
@@ -179,8 +179,8 @@
 	<div class="header">
 		<h2 class="text">О чем помнят улицы Владикавказа?</h2>
 		<p class="text">Какие категории названий преобладают в городе:
-			<span id="rev">революционно-коммунистические</span>,
-			<span id="vov">военные</span> или же <span id="cult">научно-культурные</span>?
+			<span id="vov">военные</span>, <span id="rev">революционно-коммунистические</span>
+			 или <span id="cult">научно-культурные</span>?
 		</p>
 	</div>
 
@@ -320,7 +320,7 @@
 		var map = new mapboxgl.Map({
 			container: 'map',
 			style: 'mapbox://styles/ninlin/ck2x303h21maj1cpiifynp845',
-			center: [44.67, 43.025],
+			center: [44.674485, 43.030739],
 			zoom: 12,
 			maxBounds: bounds
 		});
@@ -330,7 +330,7 @@
 		map.on('load', function() {
 			map.addSource('route', {
 				'type': 'geojson',
-				'data': 'https://raw.githubusercontent.com/Ninlin/irystory/main/streets_20210216.geojson'
+				'data': 'https://raw.githubusercontent.com/Irystory/streets/main/streets_20210303.geojson'
 			});
 			map.addLayer({
 				'id': 'route',
